@@ -12,6 +12,10 @@ EC-CUBE 3.0.18 pins `twig/twig` to 1.34.0. The last 1.x release needs PHP 7.2.5,
 | CVE-2024-51755 | Sandbox: `ArrayAccess` and `__isset()` ran before the policy check |
 | CVE-2024-45411, CVE-2026-46638, CVE-2026-46636, CVE-2026-49981 | Sandbox: the tag, filter and function allow-list was not checked again for a template that was already loaded, or when the sandbox was enabled between renders |
 
+## PHP 7.4
+
+1.34.0 drops the whitespace before every tag on PHP 7.4 (`<input type="hidden" {{ a }}>` renders as `<input type="hidden"A>`), because PHP 7.4 reports unmatched regex groups differently. Fixed in 1.34.0-p2: the output of Twig's own fixture templates is identical on PHP 7.1 and 7.4.
+
 Not applicable to 1.34.0 (the code does not exist): CVE-2026-46628 (`spaceless` filter), CVE-2026-46635 and CVE-2026-48808 (`column` filter), CVE-2026-48805 (a 3.x file). CVE-2026-46627 is a documentation change upstream.
 
 The sandbox fixes follow the final upstream design rather than each upstream patch, because 1.34 is built differently: the allow-list is checked each time a template's display method, block or macro runs. Clear the Twig cache after installing.

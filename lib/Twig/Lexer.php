@@ -171,7 +171,9 @@ class Twig_Lexer implements Twig_LexerInterface
 
         // push the template text first
         $text = $textContent = substr($this->code, $this->cursor, $position[1] - $this->cursor);
-        if (isset($this->positions[2][$this->position][0])) {
+        // PHP 7.4 reports an unmatched optional group as array('', -1) instead of leaving it out:
+        // isset() alone is always true there, and every text before a tag lost its trailing whitespace
+        if (isset($this->positions[2][$this->position][0]) && $this->options['whitespace_trim'] === $this->positions[2][$this->position][0]) {
             $text = rtrim($text);
         }
         $this->pushToken(Twig_Token::TEXT_TYPE, $text);
