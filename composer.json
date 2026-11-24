@@ -1,8 +1,10 @@
 {
-    "name": "twig/twig",
+    "name": "nobuhiko/twig",
     "type": "library",
-    "description": "Twig, the flexible, fast, and secure template language for PHP",
-    "keywords": ["templating"],
+    "description": "Twig 1.34.0 with security fixes backported, for EC-CUBE 3.0.x shops that cannot move off the versions EC-CUBE 3.0.18 ships",
+    "keywords": [
+        "templating"
+    ],
     "homepage": "http://twig.sensiolabs.org",
     "license": "BSD-3-Clause",
     "authors": [
@@ -23,28 +25,21 @@
             "role": "Project Founder"
         }
     ],
-    "support": {
-        "forum": "https://groups.google.com/forum/#!forum/twig-users"
-    },
     "require": {
         "php": ">=5.3.3"
     },
-    "require-dev": {
-        "symfony/phpunit-bridge": "~3.3@dev",
-        "symfony/debug": "~2.7",
-        "psr/container": "^1.0"
-    },
     "autoload": {
-        "psr-0" : {
-            "Twig_" : "lib/"
+        "psr-0": {
+            "Twig_": "lib/"
         },
-        "psr-4" : {
-            "Twig\\" : "src/"
+        "psr-4": {
+            "Twig\\": "src/"
         }
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.34-dev"
-        }
+    "replace": {
+        "twig/twig": "1.34.0"
+    },
+    "support": {
+        "issues": "https://github.com/nobuhiko/twig/issues"
     }
 }
