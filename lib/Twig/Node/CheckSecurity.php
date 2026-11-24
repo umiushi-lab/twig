@@ -41,6 +41,15 @@ class Twig_Node_CheckSecurity extends Twig_Node
         }
 
         $compiler
+            ->write("\n")
+            ->write("public function checkSecurity()\n")
+            ->write("{\n")
+            ->indent()
+            ->write("if (!\$this->env->getExtension('Twig_Extension_Sandbox')->isSandboxed()) {\n")
+            ->indent()
+            ->write("return;\n")
+            ->outdent()
+            ->write("}\n\n")
             ->write('$tags = ')->repr(array_filter($tags))->raw(";\n")
             ->write('$filters = ')->repr(array_filter($filters))->raw(";\n")
             ->write('$functions = ')->repr(array_filter($functions))->raw(";\n\n")
@@ -72,7 +81,9 @@ class Twig_Node_CheckSecurity extends Twig_Node
             ->write("}\n\n")
             ->write("throw \$e;\n")
             ->outdent()
-            ->write("}\n\n")
+            ->write("}\n")
+            ->outdent()
+            ->write("}\n")
         ;
     }
 }

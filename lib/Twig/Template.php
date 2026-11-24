@@ -506,14 +506,40 @@ abstract class Twig_Template implements Twig_TemplateInterface
      *
      * @internal
      */
+    /**
+     * Checks the tags, filters and functions of the template against the sandbox policy.
+     *
+     * Overridden by the templates compiled with the sandbox extension.
+     *
+     * @internal
+     */
+    public function checkSecurity()
+    {
+    }
+
     protected function getAttribute($object, $item, array $arguments = array(), $type = self::ANY_CALL, $isDefinedTest = false, $ignoreStrictCheck = false)
     {
         // array
         if (self::METHOD_CALL !== $type) {
             $arrayItem = is_bool($item) || is_float($item) ? (int) $item : $item;
 
+            // in the sandbox, offsetExists()/offsetGet() of a user class are method calls like any other (CVE-2024-51755)
+            $arrayAccessAllowed = true;
+            if ($object instanceof ArrayAccess && $this->env->hasExtension('Twig_Extension_Sandbox') && ($sandbox = $this->env->getExtension('Twig_Extension_Sandbox')) && $sandbox->isSandboxed()
+                && !in_array(get_class($object), array('ArrayObject', 'ArrayIterator', 'SplDoublyLinkedList', 'SplFixedArray', 'SplObjectStorage', 'SplQueue', 'SplStack'), true)
+            ) {
+                try {
+                    $sandbox->checkMethodAllowed($object, 'offsetGet');
+                } catch (Twig_Sandbox_SecurityNotAllowedMethodError $e) {
+                    $arrayAccessAllowed = false;
+                    if (self::ARRAY_CALL === $type) {
+                        throw $e;
+                    }
+                }
+            }
+
             if ((is_array($object) && (isset($object[$arrayItem]) || array_key_exists($arrayItem, $object)))
-                || ($object instanceof ArrayAccess && isset($object[$arrayItem]))
+                || ($arrayAccessAllowed && $object instanceof ArrayAccess && isset($object[$arrayItem]))
             ) {
                 if ($isDefinedTest) {
                     return true;
@@ -577,7 +603,17 @@ abstract class Twig_Template implements Twig_TemplateInterface
 
         // object property
         if (self::METHOD_CALL !== $type && !$object instanceof self) { // Twig_Template does not have public properties, and we don't want to allow access to internal ones
-            if (isset($object->$item) || array_key_exists((string) $item, $object)) {
+            // in the sandbox, check the property before isset(): __isset() and __get() run user code (CVE-2024-51755)
+            $propertyAllowed = true;
+            if ($this->env->hasExtension('Twig_Extension_Sandbox') && $this->env->getExtension('Twig_Extension_Sandbox')->isSandboxed()) {
+                try {
+                    $this->env->getExtension('Twig_Extension_Sandbox')->checkPropertyAllowed($object, $item);
+                } catch (Twig_Sandbox_SecurityNotAllowedPropertyError $propertyNotAllowedError) {
+                    $propertyAllowed = false;
+                }
+            }
+
+            if ($propertyAllowed && (isset($object->$item) || array_key_exists((string) $item, $object))) {
                 if ($isDefinedTest) {
                     return true;
                 }
@@ -651,6 +687,11 @@ abstract class Twig_Template implements Twig_TemplateInterface
         } else {
             if ($isDefinedTest) {
                 return false;
+            }
+
+            // no method to fall back to: report that the property is not allowed, as before
+            if (isset($propertyNotAllowedError)) {
+                throw $propertyNotAllowedError;
             }
 
             if ($ignoreStrictCheck || !$this->env->isStrictVariables()) {
