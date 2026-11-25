@@ -11,6 +11,11 @@ EC-CUBE 3.0.18 pins `twig/twig` to 1.34.0. The last 1.x release needs PHP 7.2.5,
 | CVE-2019-9942, CVE-2024-51754, CVE-2026-47732, CVE-2026-48806, CVE-2026-48807 | Sandbox: `__toString()` reached without being allowed (filter and function arguments, concatenation, comparisons, `in`, arrays and Traversables, dynamic keys, template names) |
 | CVE-2024-51755 | Sandbox: `ArrayAccess` and `__isset()` ran before the policy check |
 | CVE-2024-45411, CVE-2026-46638, CVE-2026-46636, CVE-2026-49981 | Sandbox: the tag, filter and function allow-list was not checked again for a template that was already loaded, or when the sandbox was enabled between renders |
+| CVE-2026-133771 | Autoescape: a variable with the name of a macro import alias of another block or macro was printed unescaped (1.34.0-p3) |
+| CVE-2026-133764 | Sandbox: the arguments of the `constant` test were cast to a string without the `__toString()` check (1.34.0-p3) |
+| CVE-2026-133767 | Sandbox: a dynamic parent expression of `{% embed %}` was never checked against the policy (1.34.0-p3) |
+| CVE-2026-133768 | Sandbox: the `join` filter exposed the properties of a non-iterable object (1.34.0-p3) |
+| CVE-2026-133770 | Sandbox: a template could call the constructor of a `Twig_Markup` instance again and rewrite content marked as safe (1.34.0-p3) |
 
 ## PHP 7.4
 

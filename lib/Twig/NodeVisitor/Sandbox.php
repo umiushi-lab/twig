@@ -104,6 +104,10 @@ class Twig_NodeVisitor_Sandbox extends Twig_BaseNodeVisitor
                 if ($node->hasNode('arguments') && null !== $node->getNode('arguments')) {
                     $this->wrapChildren($node->getNode('arguments'));
                 }
+            } elseif ('constant' === $node->getAttribute('name') && $node->hasNode('arguments') && null !== $node->getNode('arguments')) {
+                // CVE-2026-133764: the constant test never casts its input, but it concatenates its arguments
+                // into a constant name (constant(get_class($object).'::'.$name))
+                $this->wrapChildren($node->getNode('arguments'));
             }
         } elseif ($node instanceof Twig_Node_Expression_Binary_Concat
             || $node instanceof Twig_Node_Expression_Binary_Equal || $node instanceof Twig_Node_Expression_Binary_NotEqual

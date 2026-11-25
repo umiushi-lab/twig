@@ -735,9 +735,17 @@ function twig_join_filter($value, $glue = '')
 {
     if ($value instanceof Traversable) {
         $value = iterator_to_array($value, false);
+    } elseif (!is_array($value)) {
+        // CVE-2026-133768: an (array) cast on an object exposes its properties (private and protected ones included),
+        // which bypasses the sandbox property allow-list. A non-iterable value is joined as a single element
+        // (PHP 5 and 7 raise a recoverable fatal error, not an exception, when implode() meets such an object)
+        if (is_object($value) && !method_exists($value, '__toString')) {
+            throw new Twig_Error_Runtime(sprintf('The "join" filter cannot convert an object of class "%s" to a string.', get_class($value)));
+        }
+        $value = null === $value ? array() : array($value);
     }
 
-    return implode($glue, (array) $value);
+    return implode($glue, $value);
 }
 
 /**

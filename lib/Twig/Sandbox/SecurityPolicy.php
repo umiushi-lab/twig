@@ -84,7 +84,9 @@ class Twig_Sandbox_SecurityPolicy implements Twig_Sandbox_SecurityPolicyInterfac
 
     public function checkMethodAllowed($obj, $method)
     {
-        if ($obj instanceof Twig_TemplateInterface || $obj instanceof Twig_Markup) {
+        // CVE-2026-133770: Markup instances are trusted, except for their constructor: calling it again on an existing
+        // instance rewrites content that the application has marked as safe
+        if ($obj instanceof Twig_TemplateInterface || ($obj instanceof Twig_Markup && '__construct' !== strtolower($method))) {
             return true;
         }
 

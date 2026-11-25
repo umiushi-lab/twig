@@ -34,6 +34,7 @@ class Twig_Parser implements Twig_ParserInterface
     protected $importedSymbols;
     protected $traits;
     protected $embeddedTemplates = array();
+    protected $embeddedTemplateParent;
 
     public function __construct(Twig_Environment $env)
     {
@@ -67,6 +68,11 @@ class Twig_Parser implements Twig_ParserInterface
 
     public function parse(Twig_TokenStream $stream, $test = null, $dropNeedle = false)
     {
+        // CVE-2026-133767: the parent expression of an embedded template is set before the node visitors run,
+        // so that the sandbox checks it like any other expression (see parseEmbeddedTemplate())
+        $embeddedTemplateParent = $this->embeddedTemplateParent;
+        $this->embeddedTemplateParent = null;
+
         // push all variables into the stack to keep the current state of the parser
         // using get_object_vars() instead of foreach would lead to https://bugs.php.net/71336
         // This hack can be removed when min version if PHP 7.0
@@ -118,6 +124,10 @@ class Twig_Parser implements Twig_ParserInterface
             }
 
             throw $e;
+        }
+
+        if (null !== $embeddedTemplateParent) {
+            $this->parent = $embeddedTemplateParent;
         }
 
         $node = new Twig_Node_Module(new Twig_Node_Body(array($body)), $this->parent, new Twig_Node($this->blocks), new Twig_Node($this->macros), new Twig_Node($this->traits), $this->embeddedTemplates, $stream->getSourceContext());
@@ -309,6 +319,28 @@ class Twig_Parser implements Twig_ParserInterface
         $template->setIndex(mt_rand());
 
         $this->embeddedTemplates[] = $template;
+    }
+
+    /**
+     * Parses the body of an embed tag with the given parent expression.
+     *
+     * @internal
+     */
+    public function parseEmbeddedTemplate(Twig_TokenStream $stream, Twig_Node_Expression $parent, $test)
+    {
+        $previous = $this->embeddedTemplateParent;
+        $this->embeddedTemplateParent = $parent;
+
+        try {
+            $module = $this->parse($stream, $test, true);
+        } catch (Exception $e) {
+            $this->embeddedTemplateParent = $previous;
+
+            throw $e;
+        }
+        $this->embeddedTemplateParent = $previous;
+
+        return $module;
     }
 
     public function addImportedSymbol($type, $alias, $name = null, Twig_Node_Expression $node = null)

@@ -112,7 +112,10 @@ class Twig_NodeVisitor_SafeAnalysis extends Twig_BaseNodeVisitor
         } elseif ($node instanceof Twig_Node_Expression_GetAttr && $node->getNode('node') instanceof Twig_Node_Expression_Name) {
             $name = $node->getNode('node')->getAttribute('name');
             // attributes on template instances are safe
-            if ('_self' == $name || in_array($name, $this->safeVars)) {
+            // CVE-2026-133771: only _self. A macro called through an import alias that is in scope is compiled as a
+            // method call (always safe). Trusting every name that is an import alias somewhere in the template left a
+            // plain variable unescaped when it had the name of an alias imported in another block or macro
+            if ('_self' == $name) {
                 $this->setSafe($node, array('all'));
             } else {
                 $this->setSafe($node, array());
