@@ -1,5 +1,7 @@
 # Twig 1.34.0 with security fixes, for EC-CUBE 3.0.x
 
+[![tests](https://github.com/umiushi-lab/twig/actions/workflows/tests.yml/badge.svg?branch=eccube3%2F1.34)](https://github.com/umiushi-lab/twig/actions/workflows/tests.yml) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/umiushi-lab/twig/badge)](https://scorecard.dev/viewer/?uri=github.com/umiushi-lab/twig)
+
 EC-CUBE 3.0.18 pins `twig/twig` to 1.34.0. The last 1.x release needs PHP 7.2.5, and 1.x no longer receives fixes. This fork keeps 1.34.0 and backports the published security fixes.
 
 ## Fixed
