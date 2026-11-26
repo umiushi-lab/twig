@@ -1,0 +1,7 @@
+# GitHub Actions の版(コミットで固定してある)を、月に 1 回見直す。PHP の部品は、元の版のまま保つので対象にしない
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
