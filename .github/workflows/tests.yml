@@ -37,7 +37,7 @@ jobs:
       - name: install test tools
         run: |
           rm -f composer.lock
-          composer config audit.block-insecure false
+          composer config audit.block-insecure false 2>/dev/null || true  # Composer 2.2(PHP 7.1)には、この設定も差し止めも無い
           :
           composer require --dev --no-interaction --no-progress "symfony/phpunit-bridge:^3.4" "symfony/debug:^2.7" "psr/container:^1.0"
       - name: tests with this fork

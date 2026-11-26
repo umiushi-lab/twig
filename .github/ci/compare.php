@@ -20,7 +20,13 @@ function failed($glob)
         }
         foreach ($x->xpath('//testcase') as $t) {
             if ($t->failure || $t->error) {
-                $out[(string) $t['class'].'::'.(string) $t['name']] = true;
+                $class = (string) $t['class'];
+                if ($class === '') {
+                    // data provider の行はクラスが空なので、入れ物の名前(クラス::メソッド)を使う
+                    $p = $t->xpath('..');
+                    $class = $p ? preg_replace('/::.*$/', '', (string) $p[0]['name']) : '';
+                }
+                $out[$class.'::'.(string) $t['name']] = true;
             }
         }
     }
