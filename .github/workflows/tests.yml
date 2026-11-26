@@ -1,0 +1,31 @@
+# 元の Twig 1.34 のテスト一式を、EC-CUBE 3.0.18 のお店が使う PHP 7.1 と 7.4 で回す
+# Runs the original Twig 1.34 test suite on the PHP versions EC-CUBE 3.0.18 shops run (7.1 and 7.4).
+name: tests
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.1', '7.4']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer:v2
+          coverage: none
+      # require-dev は配布物から外してあるので、テストの道具だけここで入れる(元の 1.34 と同じ系列)
+      - run: composer require --dev --no-interaction --no-progress "symfony/phpunit-bridge:^3.4" "symfony/debug:^2.7" "psr/container:^1.0"
+      - run: vendor/bin/simple-phpunit
+        env:
+          SYMFONY_PHPUNIT_VERSION: '5.7'
+          SYMFONY_DEPRECATIONS_HELPER: weak
