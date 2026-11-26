@@ -16,6 +16,11 @@ class Twig_Tests_NativeExtensionTest extends PHPUnit_Framework_TestCase
      */
     public function testGetProperties()
     {
+        if (PHP_VERSION_ID >= 70400) {
+            // PHP 7.4 no longer exposes DateTime::$date as a dynamic property, which is what this test reads back.
+            // This checks a PHP engine quirk, not Twig code (EC-CUBE 3.0.x fork note).
+            $this->markTestSkipped('DateTime::$date is not exposed on PHP 7.4+');
+        }
         $twig = new Twig_Environment(new Twig_Loader_Array(array('index' => '{{ d1.date }}{{ d2.date }}')), array(
             'debug' => true,
             'cache' => false,

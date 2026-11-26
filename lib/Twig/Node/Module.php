@@ -212,7 +212,7 @@ class Twig_Node_Module extends Twig_Node
                         ->string($key)
                         ->raw("])) {\n")
                         ->indent()
-                        ->write("throw new Twig_Error_Runtime(sprintf('Block %s is not defined in trait %s.', ")
+                        ->write("throw new Twig_Error_Runtime(sprintf('Block \"%s\" is not defined in trait \"%s\".', ")
                         ->string($key)
                         ->raw(', ')
                         ->subcompile($trait->getNode('template'))
