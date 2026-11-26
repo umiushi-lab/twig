@@ -30,7 +30,7 @@ The sandbox fixes follow the final upstream design rather than each upstream pat
 Requires Composer 2. In the shop's project root:
 
 ```
-composer require nobuhiko/twig:^1.34.0
+composer require umiushi-lab/twig:^1.34.0
 ```
 
 The package `replace`s `twig/twig` 1.34.0, so Composer removes the original and every other package keeps working against the same version.

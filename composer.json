@@ -1,5 +1,5 @@
 {
-    "name": "nobuhiko/twig",
+    "name": "umiushi-lab/twig",
     "type": "library",
     "description": "Twig 1.34.0 with security fixes backported, for EC-CUBE 3.0.x shops that cannot move off the versions EC-CUBE 3.0.18 ships",
     "keywords": [
@@ -40,6 +40,6 @@
         "twig/twig": "1.34.0"
     },
     "support": {
-        "issues": "https://github.com/nobuhiko/twig/issues"
+        "issues": "https://github.com/umiushi-lab/twig/issues"
     }
 }
